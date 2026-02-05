@@ -11,19 +11,15 @@
 # shortcut ctrl+alt+k
 # -------------------------------
 
+import platform
 import keyboard
 import pyperclip
 from datetime import datetime
 
-def check_if_keyPressed():
+HOTKEY = 'ctrl+option+k' if platform.system() == 'Darwin' else 'ctrl+alt+k'
 
-    #while True:
-    #    if keyboard.is_pressed("q"):
-    #        print("You pressed q")
-    #        break
-            
-   #keyboard.add_hotkey('ctrl+alt+k', send_clipboard)
-   keyboard.add_hotkey('ctrl+option+k', send_clipboard)
+def check_if_keyPressed():
+   keyboard.add_hotkey(HOTKEY, send_clipboard)
 
 def send_clipboard():
     print('sending clipboard key',datetime.now())
@@ -32,8 +28,7 @@ def send_clipboard():
 
 if __name__ == '__main__':
     check_if_keyPressed()
-    print('Waiting for hotkey Ctrl+Alt+K')
-    
+    print(f'Waiting for hotkey {HOTKEY}')
 
     # Block forever, like `while True`.
     keyboard.wait()
