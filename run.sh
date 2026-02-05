@@ -1,0 +1,1 @@
+uv run clipboard2keystroke.py
