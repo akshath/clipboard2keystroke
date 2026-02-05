@@ -47,6 +47,14 @@ Once running, press **Ctrl+Alt+K** (Windows/Linux) or **Ctrl+Option+K** (macOS) 
 
 Press **Ctrl+C** in the terminal to stop the script.
 
+## Testing
+
+Run the unit tests with:
+
+```bash
+uv run --with pytest --with keyboard --with pyperclip pytest test_clipboard2keystroke.py -v
+```
+
 ## Dependencies
 
 | Package | Purpose |
