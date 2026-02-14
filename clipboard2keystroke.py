@@ -3,32 +3,48 @@
 # dependencies = [
 #   "keyboard",
 #   "pyperclip",
+#   "pynput",
 # ]
 # ///
 
 # -------------------------------
 # send clipboard to keystroke
-# shortcut ctrl+alt+k
+# shortcut ctrl+alt+k (Windows/Linux) / ctrl+option+k (macOS)
 # -------------------------------
 
 import platform
-import keyboard
 import pyperclip
 from datetime import datetime
 
-HOTKEY = 'ctrl+option+k' if platform.system() == 'Darwin' else 'ctrl+alt+k'
-
-def check_if_keyPressed():
-   keyboard.add_hotkey(HOTKEY, send_clipboard)
+IS_MACOS = platform.system() == 'Darwin'
 
 def send_clipboard():
-    print('sending clipboard key',datetime.now())
-    keyboard.write(pyperclip.paste())
+    print('sending clipboard key', datetime.now())
+    if IS_MACOS:
+        from pynput.keyboard import Controller as KbController
+        kb = KbController()
+        kb.type(pyperclip.paste())
+    else:
+        import keyboard
+        keyboard.write(pyperclip.paste())
 
 
 if __name__ == '__main__':
-    check_if_keyPressed()
-    print(f'Waiting for hotkey {HOTKEY}')
+    if IS_MACOS:
+        from pynput import keyboard as pynput_keyboard
 
-    # Block forever, like `while True`.
-    keyboard.wait()
+        HOTKEY = '<ctrl>+<alt>+k'
+        print(f'Waiting for hotkey ctrl+option+k')
+
+        def on_activate():
+            send_clipboard()
+
+        with pynput_keyboard.GlobalHotKeys({HOTKEY: on_activate}) as h:
+            h.join()
+    else:
+        import keyboard
+
+        HOTKEY = 'ctrl+alt+k'
+        keyboard.add_hotkey(HOTKEY, send_clipboard)
+        print(f'Waiting for hotkey {HOTKEY}')
+        keyboard.wait()
