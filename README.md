@@ -1,6 +1,6 @@
 # Clipboard2Keystroke
 
-A lightweight Python utility that types your clipboard contents as simulated keystrokes. Useful for applications or remote desktops that block paste (`Ctrl+V`) but still accept keyboard input.
+A lightweight Python utility that types your clipboard contents as simulated keystrokes. Useful for applications or remote desktops or websites that block paste (`Ctrl+V`) but still accept keyboard input.
 
 ## How It Works
 
