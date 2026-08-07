@@ -16,18 +16,38 @@ uv run clipboard2keystroke.py
 
 Platform-specific wrappers: `run.bat` (Windows), `run.sh` (Unix).
 
-There is a legacy `Pipfile` for pipenv, but `uv run` is the current approach.
+## Testing
+
+```
+uv run --with pytest --with keyboard --with pyperclip --with pynput pytest test_clipboard2keystroke.py -v
+```
+
+The tests never touch the real keyboard: they patch `IS_MACOS` and inject fake
+`keyboard` / `pynput` modules into `sys.modules`, so both platform branches are
+covered regardless of the host OS.
 
 ## Dependencies
 
 Declared inline at the top of `clipboard2keystroke.py`:
-- `keyboard` - global hotkey registration and keystroke simulation
 - `pyperclip` - cross-platform clipboard access
+- `keyboard` - hotkey and keystroke simulation on Windows/Linux
+- `pynput` - hotkey and keystroke simulation on macOS
 
-Requires Python >= 3.10. The `keyboard` library requires root/admin on Linux.
+Requires Python >= 3.10. The `keyboard` library requires root on Linux; `pynput`
+requires accessibility permissions on macOS.
 
 ## Architecture
 
-Single file (`clipboard2keystroke.py`): registers `ctrl+option+k` as a global hotkey via `keyboard.add_hotkey`, and on trigger calls `send_clipboard()` which reads the clipboard with `pyperclip.paste()` and types it via `keyboard.write()`. The main thread blocks on `keyboard.wait()`.
+Single file (`clipboard2keystroke.py`), split by platform because `keyboard` does
+not work reliably on macOS:
 
-Note: the hotkey is currently set to `ctrl+option+k` (macOS-style). The commented-out line shows the Windows/Linux variant `ctrl+alt+k`.
+- `IS_MACOS` selects the backend. The backend modules are imported lazily inside
+  the functions so the unused one is never loaded.
+- `type_text()` types a string via `pynput`'s `Controller.type` on macOS, or
+  `keyboard.write` elsewhere.
+- `send_clipboard()` reads the clipboard and calls `type_text()`. It catches all
+  exceptions on purpose — an exception escaping this function kills the macOS
+  hotkey listener thread.
+- `wait_for_hotkey()` registers the hotkey and blocks. Hotkeys are spelled
+  differently per backend: `MACOS_HOTKEY` (`<ctrl>+<alt>+k`) for pynput,
+  `DEFAULT_HOTKEY` (`ctrl+alt+k`) for keyboard.
