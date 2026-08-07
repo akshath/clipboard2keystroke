@@ -7,14 +7,56 @@ A lightweight Python utility that types your clipboard contents as simulated key
 1. The script registers a global hotkey and runs in the background.
 2. When you press the hotkey, it reads the current clipboard contents and types them out character by character as if you were typing on the keyboard.
 
+## Install
+
+**macOS / Linux**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/akshath/clipboard2keystroke/main/install.sh | sh
+```
+
+**Windows** (PowerShell)
+
+```powershell
+irm https://raw.githubusercontent.com/akshath/clipboard2keystroke/main/install.ps1 | iex
+```
+
+The installer installs [uv](https://github.com/astral-sh/uv) if it is missing, drops the
+script in a data directory, and puts a `clipboard2keystroke` launcher on your PATH. Then:
+
+```bash
+clipboard2keystroke     # Linux: sudo clipboard2keystroke
+```
+
+<details>
+<summary>Options and uninstall</summary>
+
+The shell installer reads `C2K_REF` (git ref, default `main`), `C2K_BIN_DIR`
+(default `~/.local/bin`) and `C2K_LIB_DIR` (default
+`~/.local/share/clipboard2keystroke`). The PowerShell installer reads `C2K_REF`
+and `C2K_DIR` (default `%LOCALAPPDATA%\clipboard2keystroke`).
+
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/akshath/clipboard2keystroke/main/install.sh | sh -s -- --uninstall
+```
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/akshath/clipboard2keystroke/main/install.ps1))) -Uninstall
+```
+
+Neither uninstaller removes `uv`.
+
+</details>
+
 ## Prerequisites
 
-- Python >= 3.10
-- [uv](https://github.com/astral-sh/uv)
+- Python >= 3.10 (installed automatically by `uv`)
 - **Linux**: requires root privileges (the `keyboard` library needs access to `/dev/input`)
 - **macOS**: requires accessibility permissions for the terminal/app running the script
 
-## Usage
+## Running from a clone
 
 Dependencies are declared inline in the script via [PEP 723](https://peps.python.org/pep-0723/), so `uv` handles everything automatically:
 

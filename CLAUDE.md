@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow
+
+Never commit directly to `main`. Every change goes on a new branch and is raised
+as a pull request for review.
+
 ## Project Overview
 
 A single-script Python utility that listens for a global hotkey and types the current clipboard contents as simulated keystrokes. Useful when paste is blocked but keyboard input is accepted.
@@ -15,6 +20,20 @@ uv run clipboard2keystroke.py
 ```
 
 Platform-specific wrappers: `run.bat` (Windows), `run.sh` (Unix).
+
+## Installers
+
+`install.sh` (POSIX sh, macOS/Linux) and `install.ps1` (Windows) are meant to be
+piped from `raw.githubusercontent.com`. Both install `uv` if it is missing,
+download `clipboard2keystroke.py` from a git ref (`C2K_REF`, default `main`),
+verify the first line is the PEP 723 header, and generate a launcher that
+`exec`s `uv run --script` against the installed copy. Both support uninstall
+(`--uninstall` / `-Uninstall`) and leave `uv` in place. `install.ps1` must stay
+compatible with Windows PowerShell 5.1 — no null-conditional (`?.`) or other
+PowerShell 7-only syntax.
+
+Any change to the download URLs must keep them pointing at the raw file path
+`clipboard2keystroke.py` at the repo root; the header check will fail otherwise.
 
 ## Testing
 
