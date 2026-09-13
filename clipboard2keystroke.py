@@ -41,14 +41,47 @@ def send_clipboard():
         print(f'failed to send clipboard: {exc}')
 
 
+def macos_hotkey_listener(pynput_keyboard, hotkey_spec, callback):
+    """Build a pynput listener for `hotkey_spec` that survives media keys.
+
+    pynput's GlobalHotKeys cannot be used here: on macOS its press callback is
+    invoked without the `injected` argument for media keys (volume, brightness,
+    play/pause), which raises a TypeError and kills the listener thread. Driving
+    a HotKey from callbacks that tolerate the missing argument avoids that.
+    """
+    hotkey = pynput_keyboard.HotKey(pynput_keyboard.HotKey.parse(hotkey_spec),
+                                    callback)
+    listener = None
+
+    def dispatch(handler, key, injected):
+        # Skip our own synthetic keystrokes, as GlobalHotKeys does.
+        if injected:
+            return
+        try:
+            handler(listener.canonical(key))
+        except Exception as exc:
+            # Never propagate: an exception here kills the listener thread.
+            print(f'failed to handle key {key}: {exc}')
+
+    def on_press(key, injected=False):
+        dispatch(hotkey.press, key, injected)
+
+    def on_release(key, injected=False):
+        dispatch(hotkey.release, key, injected)
+
+    listener = pynput_keyboard.Listener(on_press=on_press, on_release=on_release)
+    return listener
+
+
 def wait_for_hotkey():
     try:
         if IS_MACOS:
             from pynput import keyboard as pynput_keyboard
 
             print('Waiting for hotkey ctrl+option+k')
-            with pynput_keyboard.GlobalHotKeys({MACOS_HOTKEY: send_clipboard}) as h:
-                h.join()
+            with macos_hotkey_listener(pynput_keyboard, MACOS_HOTKEY,
+                                       send_clipboard) as listener:
+                listener.join()
         else:
             import keyboard
 

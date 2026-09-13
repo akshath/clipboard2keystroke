@@ -76,8 +76,63 @@ def test_wait_for_hotkey_registers_hotkey_off_macos(fake_keyboard):
 def test_wait_for_hotkey_registers_hotkey_on_macos(fake_pynput):
     with patch.object(c2k, 'IS_MACOS', True):
         c2k.wait_for_hotkey()
-    fake_pynput.GlobalHotKeys.assert_called_once_with(
-        {c2k.MACOS_HOTKEY: c2k.send_clipboard})
+    fake_pynput.HotKey.parse.assert_called_once_with(c2k.MACOS_HOTKEY)
+    fake_pynput.HotKey.assert_called_once_with(
+        fake_pynput.HotKey.parse.return_value, c2k.send_clipboard)
+    fake_pynput.Listener.assert_called_once()
+    fake_pynput.Listener.return_value.__enter__.return_value.join \
+        .assert_called_once_with()
+
+
+def _macos_callbacks(fake_pynput):
+    """Register the macOS listener and return its (on_press, on_release)."""
+    c2k.macos_hotkey_listener(fake_pynput, c2k.MACOS_HOTKEY, c2k.send_clipboard)
+    kwargs = fake_pynput.Listener.call_args.kwargs
+    return kwargs['on_press'], kwargs['on_release']
+
+
+def test_macos_callbacks_forward_real_key_events(fake_pynput):
+    on_press, on_release = _macos_callbacks(fake_pynput)
+    hotkey = fake_pynput.HotKey.return_value
+    listener = fake_pynput.Listener.return_value
+
+    on_press('k', False)
+    on_release('k', False)
+
+    hotkey.press.assert_called_once_with(listener.canonical.return_value)
+    hotkey.release.assert_called_once_with(listener.canonical.return_value)
+
+
+def test_macos_callbacks_tolerate_missing_injected_argument(fake_pynput):
+    # pynput's macOS backend calls on_press/on_release with only the key for
+    # media keys (volume, brightness, play/pause); a TypeError here would kill
+    # the listener thread.
+    on_press, on_release = _macos_callbacks(fake_pynput)
+
+    on_press('<media key>')
+    on_release('<media key>')
+
+    fake_pynput.HotKey.return_value.press.assert_called_once()
+    fake_pynput.HotKey.return_value.release.assert_called_once()
+
+
+def test_macos_callbacks_ignore_injected_events(fake_pynput):
+    on_press, on_release = _macos_callbacks(fake_pynput)
+
+    on_press('k', True)
+    on_release('k', True)
+
+    fake_pynput.HotKey.return_value.press.assert_not_called()
+    fake_pynput.HotKey.return_value.release.assert_not_called()
+
+
+def test_macos_callbacks_swallow_hotkey_errors(fake_pynput):
+    on_press, on_release = _macos_callbacks(fake_pynput)
+    fake_pynput.HotKey.return_value.press.side_effect = RuntimeError('boom')
+    fake_pynput.HotKey.return_value.release.side_effect = RuntimeError('boom')
+
+    on_press('k', False)  # must not raise
+    on_release('k', False)  # must not raise
 
 
 def test_wait_for_hotkey_exits_cleanly_on_ctrl_c(fake_keyboard):
