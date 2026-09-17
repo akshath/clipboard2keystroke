@@ -12,8 +12,11 @@
 # shortcut ctrl+alt+k (Windows/Linux) / ctrl+option+k (macOS)
 # -------------------------------
 
+import argparse
+import os
 import platform
 import pyperclip
+import time
 from datetime import datetime
 
 IS_MACOS = platform.system() == 'Darwin'
@@ -22,20 +25,54 @@ IS_MACOS = platform.system() == 'Darwin'
 MACOS_HOTKEY = '<ctrl>+<alt>+k'
 DEFAULT_HOTKEY = 'ctrl+alt+k'
 
+# Default per-character delay in milliseconds (0 disables the delay).
+DELAY_MS = 100.0
 
-def type_text(text):
+
+def type_text(text, delay_ms=0.0):
+    delay = delay_ms / 1000.0
     if IS_MACOS:
         from pynput.keyboard import Controller as KbController
-        KbController().type(text)
+        kb = KbController()
+        if delay:
+            for ch in text:
+                kb.type(ch)
+                time.sleep(delay)
+        else:
+            kb.type(text)
     else:
         import keyboard
-        keyboard.write(text)
+        if delay:
+            for ch in text:
+                keyboard.write(ch)
+                time.sleep(delay)
+        else:
+            keyboard.write(text)
+
+
+def resolve_delay(argv=None):
+    """Return the delay in ms: --delay wins, then C2K_DELAY_MS, then 100."""
+    parser = argparse.ArgumentParser(
+        description='Type clipboard contents as simulated keystrokes on a '
+                    'global hotkey.')
+    parser.add_argument('--delay', type=float, metavar='MS', default=None,
+                        help='delay in milliseconds between each typed '
+                             'character (default: 100, 0 disables)')
+    args = parser.parse_args(argv)
+    delay = args.delay
+    if delay is None:
+        env = os.environ.get('C2K_DELAY_MS')
+        if env is not None:
+            delay = float(env)
+        else:
+            delay = DELAY_MS
+    return max(delay, 0.0)
 
 
 def send_clipboard():
     print('sending clipboard key', datetime.now())
     try:
-        type_text(pyperclip.paste())
+        type_text(pyperclip.paste(), DELAY_MS)
     except Exception as exc:
         # Never propagate: on macOS an exception here kills the hotkey listener.
         print(f'failed to send clipboard: {exc}')
@@ -92,5 +129,11 @@ def wait_for_hotkey():
         print('\nstopped')
 
 
-if __name__ == '__main__':
+def main(argv=None):
+    global DELAY_MS
+    DELAY_MS = resolve_delay(argv)
     wait_for_hotkey()
+
+
+if __name__ == '__main__':
+    main()
