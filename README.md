@@ -80,6 +80,24 @@ Once running, press **Ctrl+Alt+K** (Windows/Linux) or **Ctrl+Option+K** (macOS) 
 
 Press **Ctrl+C** in the terminal to stop the script.
 
+### Typing delay
+
+Characters are typed one at a time with a 100&nbsp;ms pause between them. Adjust the delay (in milliseconds) with `--delay`, or disable it entirely with `--delay 0`:
+
+```bash
+clipboard2keystroke --delay 250
+
+./run.sh --delay 0          # running from a clone (same for run.bat)
+```
+
+If `--delay` is omitted, the `C2K_DELAY_MS` environment variable is used:
+
+```bash
+C2K_DELAY_MS=250 clipboard2keystroke
+```
+
+`--delay` always wins over the environment variable, and negative values are treated as `0`.
+
 > **Heads up:** the text goes to whichever window has focus at the moment you press the hotkey, not to the window you copied from. If your clipboard holds a password or other secret, a mistimed hotkey will type it into the wrong place — check what is focused first.
 
 ## Testing

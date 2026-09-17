@@ -1,5 +1,6 @@
+import os
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -41,7 +42,7 @@ def test_type_text_uses_pynput_on_macos(fake_pynput):
 def test_send_clipboard_types_clipboard_contents(mock_pyperclip, mock_type_text):
     mock_pyperclip.paste.return_value = 'hello world'
     c2k.send_clipboard()
-    mock_type_text.assert_called_once_with('hello world')
+    mock_type_text.assert_called_once_with('hello world', c2k.DELAY_MS)
 
 
 @patch.object(c2k, 'type_text')
@@ -49,7 +50,7 @@ def test_send_clipboard_types_clipboard_contents(mock_pyperclip, mock_type_text)
 def test_send_clipboard_handles_empty_clipboard(mock_pyperclip, mock_type_text):
     mock_pyperclip.paste.return_value = ''
     c2k.send_clipboard()
-    mock_type_text.assert_called_once_with('')
+    mock_type_text.assert_called_once_with('', c2k.DELAY_MS)
 
 
 @patch.object(c2k, 'pyperclip')
@@ -139,3 +140,57 @@ def test_wait_for_hotkey_exits_cleanly_on_ctrl_c(fake_keyboard):
     fake_keyboard.wait.side_effect = KeyboardInterrupt
     with patch.object(c2k, 'IS_MACOS', False):
         c2k.wait_for_hotkey()  # must not raise
+
+
+@patch.object(c2k.time, 'sleep')
+def test_type_text_delays_between_chars_off_macos(mock_sleep, fake_keyboard):
+    with patch.object(c2k, 'IS_MACOS', False):
+        c2k.type_text('ab', delay_ms=50)
+    fake_keyboard.write.assert_has_calls([call('a'), call('b')])
+    assert fake_keyboard.write.call_count == 2
+    mock_sleep.assert_has_calls([call(0.05), call(0.05)])
+    assert mock_sleep.call_count == 2
+
+
+@patch.object(c2k.time, 'sleep')
+def test_type_text_delays_between_chars_on_macos(mock_sleep, fake_pynput):
+    with patch.object(c2k, 'IS_MACOS', True):
+        c2k.type_text('ab', delay_ms=50)
+    controller = fake_pynput.Controller.return_value
+    controller.type.assert_has_calls([call('a'), call('b')])
+    assert controller.type.call_count == 2
+    mock_sleep.assert_has_calls([call(0.05), call(0.05)])
+    assert mock_sleep.call_count == 2
+
+
+def test_type_text_zero_delay_types_at_once(fake_keyboard):
+    with patch.object(c2k, 'IS_MACOS', False):
+        c2k.type_text('hello', delay_ms=0)
+    fake_keyboard.write.assert_called_once_with('hello')
+
+
+def test_resolve_delay_defaults_to_module_value(fake_keyboard):
+    with patch.dict(os.environ, {}, clear=False):
+        os.environ.pop('C2K_DELAY_MS', None)
+        assert c2k.resolve_delay([]) == c2k.DELAY_MS
+
+
+def test_resolve_delay_reads_env_var(fake_keyboard):
+    with patch.dict(os.environ, {'C2K_DELAY_MS': '250'}):
+        assert c2k.resolve_delay([]) == 250.0
+
+
+def test_resolve_delay_flag_wins_over_env(fake_keyboard):
+    with patch.dict(os.environ, {'C2K_DELAY_MS': '250'}):
+        assert c2k.resolve_delay(['--delay', '50']) == 50.0
+
+
+def test_resolve_delay_clamps_negative(fake_keyboard):
+    assert c2k.resolve_delay(['--delay', '-10']) == 0.0
+
+
+@patch.object(c2k, 'wait_for_hotkey')
+def test_main_sets_delay_before_waiting(mock_wait):
+    c2k.main(['--delay', '250'])
+    assert c2k.DELAY_MS == 250.0
+    mock_wait.assert_called_once_with()

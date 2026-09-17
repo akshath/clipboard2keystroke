@@ -1,2 +1,2 @@
 #!/bin/bash
-uv run clipboard2keystroke.py
+uv run clipboard2keystroke.py "$@"
