@@ -44,6 +44,12 @@ shortcuts are unaffected.
   `execCommand('insertText')` (trusted input events), falling back to the native
   value setter. Skips newlines in single-line inputs, respects a cancelled
   keydown, and stops if focus leaves the field.
+- `options.html` / `options.css` / `options.js`: the settings page. It loads
+  `typer.js` too, so its "Try it" field shows the real typing. It uses system
+  fonts only, so the page makes no network requests. Badge colours in
+  `background.js` match its legend.
+- `icons/`: `icon.svg` (48/128 px), `icon-32.svg` and `icon-16.svg`
+  (simplified for small sizes) are the sources for the PNGs.
 
 ## Installers
 

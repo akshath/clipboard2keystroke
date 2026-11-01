@@ -102,10 +102,12 @@ async function readClipboard() {
 // Short feedback on the toolbar icon: badge plus a tooltip explaining it.
 async function flash(tabId, status, detail) {
   const badge = {
-    typed: ['OK', '#188038'], stopped: ['STOP', '#e37400'],
-    busy: ['…', '#e37400'], empty: ['0', '#e37400'],
-    'no-field': ['?', '#e37400'], error: ['ERR', '#d93025'],
-  }[status] || ['?', '#d93025'];
+    // Same colours as the legend on the settings page; dark enough for the
+    // white badge text to stay readable.
+    typed: ['OK', '#188038'], stopped: ['STOP', '#B45309'],
+    busy: ['…', '#B45309'], empty: ['0', '#B45309'],
+    'no-field': ['?', '#B45309'], error: ['ERR', '#C5221F'],
+  }[status] || ['?', '#C5221F'];
   const title = detail || MESSAGES[status] ||
     (status === 'stopped' ? 'Stopped: focus left the field.' : '');
   await chrome.action.setBadgeBackgroundColor({ tabId, color: badge[1] });

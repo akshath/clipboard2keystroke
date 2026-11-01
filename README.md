@@ -113,7 +113,7 @@ On macOS, a focused password field (or a browser that leaves it stuck on) turns 
 - Newlines are skipped in single-line fields, so a password copied with a trailing newline never submits the form.
 - Typing stops if focus leaves the field.
 - The toolbar icon shows the result briefly: **OK**, **?** (no text field focused), **STOP** (focus moved), **ERR** (the page can't be scripted, such as `chrome://` pages or the web store). Hover the icon for details.
-- To change the delay (default 100 ms), right-click the toolbar icon and choose **Options**. Change the shortcut at `chrome://extensions/shortcuts`.
+- Right-click the toolbar icon and choose **Options** for the settings page: typing speed (default 100 ms per character), the current shortcut, a test field to try the speed, and what each badge means. Change the shortcut at `chrome://extensions/shortcuts`.
 
 It works only inside browser tabs. For native apps, VMs and remote desktop clients, use the Python script.
 
