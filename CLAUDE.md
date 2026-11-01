@@ -62,11 +62,21 @@ not work reliably on macOS:
 
 - `IS_MACOS` selects the backend. The backend modules are imported lazily inside
   the functions so the unused one is never loaded.
-- `type_text()` types a string via `pynput`'s `Controller.type` on macOS, or
-  `keyboard.write` elsewhere.
-- `send_clipboard()` reads the clipboard and calls `type_text()`. It catches all
-  exceptions on purpose — an exception escaping this function kills the macOS
-  hotkey listener thread.
+- `type_text()` types a string via pynput on macOS, or `keyboard.write`
+  elsewhere. On macOS each character goes through `macos_type_char()`, which
+  sends the character's real keycode (holding Shift when needed) from
+  `build_macos_char_map()`. Don't go back to `Controller.type` for mapped
+  characters: pynput's map only covers unshifted characters and sends the rest
+  as keycode 0 (the A key) with a unicode override, which remote desktops, VMs
+  and browser keydown handlers read as `a`. Control codes and characters with
+  no key on the layout still fall back to `Controller.type`.
+- `on_hotkey()` is the hotkey callback on both platforms. It runs
+  `send_clipboard()` on a worker thread and ignores presses while a paste is
+  still typing. Never type inside the listener callback: it blocks the macOS
+  event tap for the whole paste, and macOS can disable a stalled tap.
+- `send_clipboard()` waits for the hotkey's modifiers to be released
+  (`wait_for_modifier_release()`, macOS only, 2 s timeout), reads the clipboard
+  and calls `type_text()`. It catches all exceptions on purpose.
 - `wait_for_hotkey()` registers the hotkey and blocks. Hotkeys are spelled
   differently per backend: `MACOS_HOTKEY` (`<ctrl>+<alt>+k`) for pynput,
   `DEFAULT_HOTKEY` (`ctrl+alt+k`) for keyboard.
