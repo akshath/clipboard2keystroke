@@ -21,6 +21,26 @@ uv run clipboard2keystroke.py
 
 Platform-specific wrappers: `run.bat` (Windows), `run.sh` (Unix).
 
+## Browser extension
+
+`extension/` is a Manifest V3 Chrome/Edge extension for web pages. It exists
+because macOS Secure Input (turned on by focused password fields, and sometimes
+left on by Chromium browsers) hides keyDown events from the Python script's
+event tap; only modifier events get through. Browser-handled `chrome.commands`
+shortcuts are unaffected.
+
+- `background.js`: on the `type-clipboard` command (`Alt+Shift+K`, kept
+  different from the script's hotkey so both can run), reads the clipboard via
+  an offscreen document (`offscreen.js`, `execCommand('paste')`, because
+  service workers have no DOM and offscreen docs never have focus), injects
+  `typer.js` into all frames, then calls `c2kTypeText`. Only the focused frame
+  types. If an all-frames inject fails, it retries the top frame alone.
+- `typer.js`: no extension APIs, so `test/typer-test.html` can test it in plain
+  headless Chrome. Types each code point with keydown/keypress/keyup plus
+  `execCommand('insertText')` (trusted input events), falling back to the native
+  value setter. Skips newlines in single-line inputs, respects a cancelled
+  keydown, and stops if focus leaves the field.
+
 ## Installers
 
 `install.sh` (POSIX sh, macOS/Linux) and `install.ps1` (Windows) are meant to be

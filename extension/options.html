@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Clipboard2Keystroke options</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; max-width: 34em; margin: 2em auto; }
+    label { display: block; margin: 1em 0 .3em; font-weight: 600; }
+    input { width: 6em; }
+    .hint { color: #555; }
+    #saved { color: #188038; margin-left: .5em; }
+  </style>
+</head>
+<body>
+  <h1>Clipboard2Keystroke</h1>
+  <p>Click into a field on a web page and press
+    <kbd id="shortcut">Alt+Shift+K</kbd> to type the clipboard into it.</p>
+  <p class="hint">
+    <a href="#" id="change-shortcut">Change the shortcut</a>
+  </p>
+
+  <label for="delay">Delay between characters (ms)</label>
+  <input id="delay" type="number" min="0" step="10">
+  <span id="saved"></span>
+  <p class="hint">0 types everything at once. Raise it if a site drops characters.</p>
+
+  <script src="options.js"></script>
+</body>
+</html>
