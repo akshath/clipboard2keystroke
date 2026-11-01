@@ -9,10 +9,11 @@ Add-ons (https://addons.mozilla.org/developers/).
 
 1. Raise `version` in `extension/manifest.json`. The store rejects a version
    it has already seen.
-2. Run `./package.sh` to build `dist/clipboard2keystroke-<version>.zip`.
+2. Run `./package.sh`. It builds `dist/clipboard2keystroke-chrome-<version>.zip`
+   (Chrome and Edge) and `dist/clipboard2keystroke-firefox-<version>.zip`.
 3. If the settings page or logo changed, run `store/render.sh` to refresh the
    images.
-4. Upload the zip: **Package › Upload new package**.
+4. Upload the matching zip: **Package › Upload new package**.
 
 ## Store listing tab
 
@@ -107,13 +108,13 @@ https://github.com/akshath/clipboard2keystroke/blob/main/PRIVACY.md
 
 ## Edge Add-ons
 
-Partner Center takes the same zip, description, images and privacy policy
+Partner Center takes the Chrome zip, description, images and privacy policy
 URL. Edge doesn't ask for per-permission justifications in the same form; if
 it asks for notes for certification, paste the permission table above.
 
 ## Firefox Add-ons (AMO)
 
-The same zip works. Fields on addons.mozilla.org:
+Upload the Firefox zip. Fields on addons.mozilla.org:
 
 | Field | Value |
 |---|---|
@@ -135,5 +136,5 @@ The data-collection answer comes from the manifest
 **Notes to reviewer:**
 
 ```
-The extension reads the clipboard only when the user clicks the toolbar icon or presses Alt+Shift+K, then types it into the field the user selected on the current tab (activeTab + scripting). Nothing is stored except the typing-speed setting, and there are no network requests. The "offscreen" permission and offscreen.html/offscreen.js are used only by Chrome; Firefox reads the clipboard directly from the background page. To test: copy some text, click into any text field, then click the toolbar icon.
+The extension reads the clipboard only when the user clicks the toolbar icon or presses Alt+Shift+K, then types it into the field the user selected on the current tab (activeTab + scripting). Nothing is stored except the typing-speed setting, and there are no network requests. The clipboard is read directly from the background page with the clipboardRead permission. To test: copy some text, click into any text field, then click the toolbar icon.
 ```

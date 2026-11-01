@@ -40,8 +40,16 @@ From the repo root:
 ./package.sh
 ```
 
-This writes `dist/clipboard2keystroke-<version>.zip`, with `manifest.json` at
-the top level. The version comes from `extension/manifest.json`.
+This writes, using the version from `extension/manifest.json`:
+
+- `dist/clipboard2keystroke-chrome-<version>.zip` for Chrome and Edge,
+- `dist/clipboard2keystroke-firefox-<version>.zip` for Firefox,
+- `dist/firefox/`, the unpacked Firefox build, for testing.
+
+The Firefox build uses a background page instead of a service worker, leaves
+out the offscreen page and adds the add-on ID from
+`firefox/browser_specific_settings.json`. The script needs `python3` or `uv`
+for this.
 
 If the logo or the settings page changed since the images were made, refresh
 them too:
@@ -65,7 +73,7 @@ Look through the four images in `store/` before uploading them.
 
 ### 3.2 Create the item
 
-1. Click **New item** and upload `dist/clipboard2keystroke-<version>.zip`.
+1. Click **New item** and upload `dist/clipboard2keystroke-chrome-<version>.zip`.
 2. The dashboard opens the new draft. Its name, summary and icon come from
    the manifest.
 
@@ -128,7 +136,8 @@ Edge has its own store. Registration is free.
 1. Open
    [Partner Center › Edge](https://partner.microsoft.com/dashboard/microsoftedge)
    and register as a developer.
-2. Click **Create new extension** and upload the same zip.
+2. Click **Create new extension** and upload the Chrome zip
+   (`dist/clipboard2keystroke-chrome-<version>.zip`).
 3. **Availability:** Public or Hidden, and all markets.
 4. **Properties:** category Productivity, privacy policy URL, website and
    support URLs from `STORE_LISTING.md`.
@@ -141,25 +150,23 @@ Edge reviews typically take up to a week.
 
 ## 5. Firefox Add-ons (optional)
 
-The same zip works in Firefox 140 and later. Publishing is free, and Mozilla
+Firefox 140 and later. Use the Firefox build from `./package.sh`. Publishing is free, and Mozilla
 signs the add-on, which regular Firefox needs before it will keep it
 installed.
 
 ### 5.1 Check it first
 
 1. In Firefox, open `about:debugging#/runtime/this-firefox`, click **Load
-   Temporary Add-on** and pick `extension/manifest.json`.
+   Temporary Add-on** and pick `dist/firefox/manifest.json`.
 2. Try it on a login page with the toolbar icon and the shortcut, and open the
    settings page from `about:addons`.
 3. Run Mozilla's linter, the same checks AMO runs on upload:
 
    ```bash
-   cd extension && npx web-ext lint --ignore-files "test/**" "icons/*.svg"
+   cd dist/firefox && npx web-ext lint
    ```
 
-   Warnings about `offscreen` and `background.service_worker` are expected:
-   Firefox doesn't use them, and Chrome needs them. Fix anything listed as
-   an error.
+   Fix anything listed as an error.
 
 ### 5.2 Submit
 
@@ -169,7 +176,7 @@ installed.
 2. Click **Submit a New Add-on**.
 3. Choose **On this site** to list it on addons.mozilla.org. (**On your own**
    gets a signed `.xpi` to share yourself, without a listing.)
-4. Upload `dist/clipboard2keystroke-<version>.zip` and keep **Firefox**
+4. Upload `dist/clipboard2keystroke-firefox-<version>.zip` and keep **Firefox**
    ticked as the platform. The validator runs straight away.
 5. When asked whether you need to submit source code, answer **No**: nothing
    is minified, bundled or generated.
@@ -181,7 +188,7 @@ installed.
 Listed add-ons are usually signed and live within minutes to a day. A
 reviewer may look at it afterwards and ask for changes by email.
 
-The add-on ID in the manifest (`browser_specific_settings.gecko.id`) ties
+The add-on ID in `firefox/browser_specific_settings.json` ties
 every future version to this listing. Never change it after the first
 upload.
 
@@ -189,14 +196,15 @@ upload.
 
 1. Make and merge the change as usual (branch and pull request).
 2. Raise `version` in `extension/manifest.json`, for example `1.0.0` to
-   `1.0.1`. Both stores reject a version they've seen before.
+   `1.0.1`. The stores reject a version they've seen before. The Firefox build
+   takes its version from the same file.
 3. Run `./package.sh` (and `store/render.sh` if the visuals changed).
 4. **Chrome:** open the item in the dashboard, go to **Package**, click
-   **Upload new package**, then **Submit for review**.
+   **Upload new package**, upload the Chrome zip, then **Submit for review**.
    **Edge:** open the extension in Partner Center, choose **Update**, upload
-   the zip, then **Publish**.
+   the Chrome zip, then **Publish**.
    **Firefox:** open the add-on in the Developer Hub, click **Upload New
-   Version**, upload the zip and add release notes.
+   Version**, upload the Firefox zip and add release notes.
 5. If you changed permissions or how data is handled, update
    `PRIVACY.md`, `STORE_LISTING.md` and the store's **Privacy** tab in the
    same release.
