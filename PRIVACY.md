@@ -2,8 +2,8 @@
 
 _Last updated: 1 November 2026_
 
-This policy covers the Clipboard2Keystroke browser extension for Chrome and
-Edge, and the Clipboard2Keystroke desktop script.
+This policy covers the Clipboard2Keystroke browser extension for Chrome,
+Edge and Firefox, and the Clipboard2Keystroke desktop script.
 
 ## In short
 

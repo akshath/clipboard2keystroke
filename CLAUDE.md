@@ -23,7 +23,8 @@ Platform-specific wrappers: `run.bat` (Windows), `run.sh` (Unix).
 
 ## Browser extension
 
-`extension/` is a Manifest V3 Chrome/Edge extension for web pages. It exists
+`extension/` is a Manifest V3 extension for Chrome, Edge and Firefox, from one
+shared manifest and codebase. It exists
 because macOS Secure Input (turned on by focused password fields, and sometimes
 left on by Chromium browsers) hides keyDown events from the Python script's
 event tap; only modifier events get through. Browser-handled `chrome.commands`
@@ -50,6 +51,15 @@ shortcuts are unaffected.
   `background.js` match its legend.
 - `icons/`: `icon.svg` (48/128 px), `icon-32.svg` and `icon-16.svg`
   (simplified for small sizes) are the sources for the PNGs.
+
+Firefox differences, all handled at runtime from the same files: the manifest
+lists both `background.service_worker` (Chrome 121+ uses it and ignores
+`scripts`) and `background.scripts` (Firefox). Firefox has no `chrome.offscreen`,
+so `readClipboard()` reads `navigator.clipboard` directly from the background
+page. Options use `options_ui` (not `options_page`), and "Change shortcut" calls
+`commands.openShortcutSettings()` where it exists. `browser_specific_settings.gecko`
+holds the add-on ID (don't change it once published) and
+`data_collection_permissions`.
 
 Publishing: `package.sh` zips `extension/` into `dist/` (skipping `test/` and
 the icon SVGs). `store/render.sh` renders the store images from

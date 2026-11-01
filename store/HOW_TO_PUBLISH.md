@@ -1,7 +1,7 @@
 # How to publish the extension
 
-Step-by-step guide to publishing Clipboard2Keystroke on the Chrome Web Store
-and Microsoft Edge Add-ons, and to releasing updates later.
+Step-by-step guide to publishing Clipboard2Keystroke on the Chrome Web Store,
+Microsoft Edge Add-ons and Firefox Add-ons, and to releasing updates later.
 
 The text to paste into the store forms is in
 [`STORE_LISTING.md`](STORE_LISTING.md). This guide says where it goes.
@@ -19,6 +19,7 @@ You need:
   [2-step verification](https://myaccount.google.com/signinoptions/two-step-verification)
   turned on (the dashboard requires it).
 - A Microsoft account for Edge Add-ons (optional).
+- A Firefox account for Firefox Add-ons (optional).
 - Chrome installed, to render the images.
 - `zip` on your path (built into macOS and most Linux systems).
 
@@ -138,7 +139,53 @@ Edge has its own store. Registration is free.
 
 Edge reviews typically take up to a week.
 
-## 5. Releasing an update
+## 5. Firefox Add-ons (optional)
+
+The same zip works in Firefox 140 and later. Publishing is free, and Mozilla
+signs the add-on, which regular Firefox needs before it will keep it
+installed.
+
+### 5.1 Check it first
+
+1. In Firefox, open `about:debugging#/runtime/this-firefox`, click **Load
+   Temporary Add-on** and pick `extension/manifest.json`.
+2. Try it on a login page with the toolbar icon and the shortcut, and open the
+   settings page from `about:addons`.
+3. Run Mozilla's linter, the same checks AMO runs on upload:
+
+   ```bash
+   cd extension && npx web-ext lint --ignore-files "test/**" "icons/*.svg"
+   ```
+
+   Warnings about `offscreen` and `background.service_worker` are expected:
+   Firefox doesn't use them, and Chrome needs them. Fix anything listed as
+   an error.
+
+### 5.2 Submit
+
+1. Sign in at the
+   [Firefox Add-on Developer Hub](https://addons.mozilla.org/developers/) and
+   accept the developer agreement.
+2. Click **Submit a New Add-on**.
+3. Choose **On this site** to list it on addons.mozilla.org. (**On your own**
+   gets a signed `.xpi` to share yourself, without a listing.)
+4. Upload `dist/clipboard2keystroke-<version>.zip` and keep **Firefox**
+   ticked as the platform. The validator runs straight away.
+5. When asked whether you need to submit source code, answer **No**: nothing
+   is minified, bundled or generated.
+6. Fill in the listing from the **Firefox Add-ons (AMO)** section of
+   `STORE_LISTING.md`: summary, description, category, support link,
+   license, privacy policy text and screenshots.
+7. Paste the **Notes to reviewer** from `STORE_LISTING.md`, then submit.
+
+Listed add-ons are usually signed and live within minutes to a day. A
+reviewer may look at it afterwards and ask for changes by email.
+
+The add-on ID in the manifest (`browser_specific_settings.gecko.id`) ties
+every future version to this listing. Never change it after the first
+upload.
+
+## 6. Releasing an update
 
 1. Make and merge the change as usual (branch and pull request).
 2. Raise `version` in `extension/manifest.json`, for example `1.0.0` to
@@ -148,6 +195,8 @@ Edge reviews typically take up to a week.
    **Upload new package**, then **Submit for review**.
    **Edge:** open the extension in Partner Center, choose **Update**, upload
    the zip, then **Publish**.
+   **Firefox:** open the add-on in the Developer Hub, click **Upload New
+   Version**, upload the zip and add release notes.
 5. If you changed permissions or how data is handled, update
    `PRIVACY.md`, `STORE_LISTING.md` and the store's **Privacy** tab in the
    same release.
@@ -157,7 +206,7 @@ Users get the update automatically within a few hours of approval.
 Adding a new permission makes the browser disable the extension until each
 user accepts the new permission, so only add one when it's really needed.
 
-## 6. If the review is rejected
+## 7. If the review is rejected
 
 The rejection email names the policy and usually what to change. Common ones
 for this kind of extension:
