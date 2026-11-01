@@ -1,13 +1,28 @@
+<p align="center">
+  <img src="extension/icons/icon128.png" width="96" height="96" alt="Clipboard2Keystroke logo">
+</p>
+
 # Clipboard2Keystroke
 
-A lightweight Python utility that types your clipboard contents as simulated keystrokes. Useful for applications or remote desktops or websites that block paste (`Ctrl+V`) but still accept keyboard input.
+Types your clipboard contents as simulated keystrokes. Useful for apps, remote desktops and websites that block paste (`Ctrl+V`) but still accept keyboard input.
 
-## How It Works
+It comes in two forms:
+
+| | Desktop script | Browser extension |
+|---|---|---|
+| **Use it for** | Native apps, VMs, remote desktop clients | Web pages, especially login forms |
+| **Trigger** | **Ctrl+Shift+K** (on macOS too: Control, not Cmd) | Click the toolbar icon, or **Alt+Shift+K** (macOS: **Option+Shift+K**) |
+| **Runs on** | Windows, macOS, Linux (Python via `uv`) | Chrome, Edge |
+| **Set up** | [Desktop script](#desktop-script) | [Browser extension](#browser-extension-chrome--edge) |
+
+On macOS, use the extension for password fields. A focused password field turns on Secure Input, which hides your keystrokes from the desktop script (see [Troubleshooting](#troubleshooting)).
+
+## Desktop script
 
 1. The script registers a global hotkey and runs in the background.
 2. When you press the hotkey, it reads the current clipboard contents and types them out character by character as if you were typing on the keyboard.
 
-## Install
+### Install
 
 **macOS / Linux**
 
@@ -50,13 +65,13 @@ Neither uninstaller removes `uv`.
 
 </details>
 
-## Prerequisites
+### Prerequisites
 
 - Python >= 3.10 (installed automatically by `uv`)
 - **Linux**: requires root privileges (the `keyboard` library needs access to `/dev/input`)
 - **macOS**: requires accessibility permissions for the terminal/app running the script
 
-## Running from a clone
+### Running from a clone
 
 Dependencies are declared inline in the script via [PEP 723](https://peps.python.org/pep-0723/), so `uv` handles everything automatically:
 
@@ -106,7 +121,14 @@ For web pages, especially login forms, use the browser extension in [`extension/
 
 On macOS, a focused password field (or a browser that leaves it stuck on) turns on **Secure Input**. That hides keystrokes from every other app, so the Python script never sees its hotkey. The extension's shortcut is handled by the browser itself, so it still works.
 
-**Install:** open `chrome://extensions` (or `edge://extensions`), turn on **Developer mode**, click **Load unpacked** and pick the `extension` folder.
+**Install:**
+
+1. Get the code: `git clone https://github.com/akshath/clipboard2keystroke.git`, or [download the ZIP](https://github.com/akshath/clipboard2keystroke/archive/refs/heads/main.zip) and unzip it.
+2. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode**.
+3. Click **Load unpacked** and pick the `extension` folder.
+4. Optional: pin the icon to the toolbar from the puzzle-piece menu so it's one click away.
+
+To update later, pull or download again, then click the reload icon on the extension's card.
 
 **Use:** click into a field, then either click the extension's toolbar icon or press **Alt+Shift+K** (on macOS **Option+Shift+K**). The extension types the clipboard into that field one character at a time. It uses a different shortcut from the Python script so that running both never types twice.
 
@@ -117,20 +139,31 @@ On macOS, a focused password field (or a browser that leaves it stuck on) turns 
 
 It works only inside browser tabs. For native apps, VMs and remote desktop clients, use the Python script.
 
-To test the typing logic:
+## Troubleshooting
+
+**macOS: the desktop script is running but the hotkey does nothing.** Another app has turned on Secure Input, usually a browser with a password field focused (Chromium browsers sometimes leave it stuck on). While it is on, macOS hides keystrokes from every other app. Find out which app:
+
+```bash
+ioreg -l -w 0 | grep -o '"kCGSSessionSecureInputPID"=[0-9]*'
+ps -p <that PID>
+```
+
+Click out of the password field or quit that app. For web pages, use the browser extension instead: it is not affected.
+
+## Testing
+
+Desktop script unit tests:
+
+```bash
+uv run --with pytest --with keyboard --with pyperclip --with pynput pytest test_clipboard2keystroke.py -v
+```
+
+Extension typing tests, in headless Chrome:
 
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
   --virtual-time-budget=10000 --dump-dom "file://$PWD/extension/test/typer-test.html" \
   | grep -E '^(PASS|FAIL|ALL)'
-```
-
-## Testing
-
-Run the unit tests with:
-
-```bash
-uv run --with pytest --with keyboard --with pyperclip --with pynput pytest test_clipboard2keystroke.py -v
 ```
 
 ## Dependencies
