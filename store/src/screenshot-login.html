@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- Store screenshot 1, 1280x800: the extension typing into a demo login form.
+     The site shown is a made-up placeholder, not a real service. -->
+<html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}
+body{margin:0;width:1280px;height:800px;overflow:hidden;background:#F4F3EF;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1B1E27}
+.wrap{height:100%;display:flex;align-items:center;gap:56px;padding:0 64px}
+.copy{flex:0 0 380px;display:flex;flex-direction:column;gap:22px}
+h1{margin:0;font-size:46px;line-height:1.08;letter-spacing:-.025em}
+h1 span{color:#2F5BE0}
+.steps{display:flex;flex-direction:column;gap:14px;margin:8px 0 0;padding:0;list-style:none}
+.steps li{display:flex;align-items:center;gap:14px;font-size:19px}
+.num{flex:none;width:34px;height:34px;border-radius:10px;background:#2F5BE0;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center}
+.browser{flex:1;height:620px;background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(20,24,33,.18),0 0 0 1px #E2E0DA;overflow:hidden;display:flex;flex-direction:column}
+.bar{height:56px;background:#ECEBE6;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid #E2E0DA}
+.dots{display:flex;gap:8px}.dots i{width:12px;height:12px;border-radius:50%;background:#CFCCC4;display:block}
+.url{flex:1;height:34px;border-radius:17px;background:#fff;display:flex;align-items:center;padding:0 16px;font-size:14px;color:#5A5F6B}
+.ext{position:relative;width:40px;height:40px;border-radius:10px;background:#DDE5FF;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #2F5BE0}
+.badge{position:absolute;right:-8px;bottom:-6px;background:#188038;color:#fff;font-size:11px;font-weight:700;padding:2px 5px;border-radius:5px}
+.page{flex:1;display:flex;align-items:center;justify-content:center;background:#FAFAF8}
+.form{width:380px;display:flex;flex-direction:column;gap:14px}
+.form h2{margin:0 0 6px;font-size:26px}
+label{font-size:14px;font-weight:600}
+.field{height:46px;border:1px solid #CFCCC4;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-size:16px;background:#fff}
+.field.focus{border:2px solid #2F5BE0;box-shadow:0 0 0 4px #DDE5FF}
+.dotsfield{letter-spacing:4px;font-size:20px}
+.caret{width:2px;height:22px;background:#1B1E27;margin-left:2px}
+.note{font-size:13px;color:#B45309;background:#FDF3E7;border-radius:8px;padding:8px 12px}
+.btn{height:46px;border-radius:10px;background:#1B1E27;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:6px}
+</style></head><body><div class="wrap">
+<div class="copy">
+<img src="../../extension/icons/icon.svg" width="64" height="64" alt="">
+<h1>Paste blocked?<br><span>Type it instead.</span></h1>
+<ol class="steps">
+<li><span class="num">1</span>Copy your password</li>
+<li><span class="num">2</span>Click into the field</li>
+<li><span class="num">3</span>Click the icon or press ⌥⇧K</li>
+</ol>
+</div>
+<div class="browser">
+<div class="bar"><div class="dots"><i></i><i></i><i></i></div>
+<div class="url">login.example.com</div>
+<div class="ext"><img src="../../extension/icons/icon32.png" width="24" height="24" alt=""><span class="badge">OK</span></div></div>
+<div class="page"><div class="form">
+<h2>Sign in</h2>
+<label>Email</label><div class="field">you@example.com</div>
+<label>Password</label><div class="field focus dotsfield">•••••••••••••<span class="caret"></span></div>
+<div class="note">Pasting is disabled on this page.</div>
+<div class="btn">Sign in</div>
+</div></div>
+</div>
+</div></body></html>

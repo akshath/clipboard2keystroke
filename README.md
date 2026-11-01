@@ -139,6 +139,10 @@ To update later, pull or download again, then click the reload icon on the exten
 
 It works only inside browser tabs. For native apps, VMs and remote desktop clients, use the Python script.
 
+### Publishing
+
+`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store and Edge Add-ons. [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
+
 ## Troubleshooting
 
 **macOS: the desktop script is running but the hotkey does nothing.** Another app has turned on Secure Input, usually a browser with a password field focused (Chromium browsers sometimes leave it stuck on). While it is on, macOS hides keystrokes from every other app. Find out which app:
