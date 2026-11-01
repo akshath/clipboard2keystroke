@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard2Keystroke",
+  "version": "1.0.0",
+  "description": "Type the clipboard into the focused field of a web page, one character at a time, for sites that block paste.",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "clipboardRead",
+    "offscreen",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    },
+    "default_title": "Type the clipboard into the focused field (or press Alt+Shift+K)"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "type-clipboard": {
+      "suggested_key": {
+        "default": "Alt+Shift+K",
+        "mac": "Alt+Shift+K"
+      },
+      "description": "Type the clipboard into the focused field"
+    }
+  }
+}

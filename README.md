@@ -100,6 +100,31 @@ C2K_DELAY_MS=250 clipboard2keystroke
 
 > **Heads up:** the text goes to whichever window has focus at the moment you press the hotkey, not to the window you copied from. If your clipboard holds a password or other secret, a mistimed hotkey will type it into the wrong place — check what is focused first.
 
+## Browser extension (Chrome / Edge)
+
+For web pages, especially login forms, use the browser extension in [`extension/`](extension/).
+
+On macOS, a focused password field (or a browser that leaves it stuck on) turns on **Secure Input**. That hides keystrokes from every other app, so the Python script never sees its hotkey. The extension's shortcut is handled by the browser itself, so it still works.
+
+**Install:** open `chrome://extensions` (or `edge://extensions`), turn on **Developer mode**, click **Load unpacked** and pick the `extension` folder.
+
+**Use:** click into a field, then either click the extension's toolbar icon or press **Alt+Shift+K** (on macOS **Option+Shift+K**). The extension types the clipboard into that field one character at a time. It uses a different shortcut from the Python script so that running both never types twice.
+
+- Newlines are skipped in single-line fields, so a password copied with a trailing newline never submits the form.
+- Typing stops if focus leaves the field.
+- The toolbar icon shows the result briefly: **OK**, **?** (no text field focused), **STOP** (focus moved), **ERR** (the page can't be scripted, such as `chrome://` pages or the web store). Hover the icon for details.
+- Right-click the toolbar icon and choose **Options** for the settings page: typing speed (default 100 ms per character), the current shortcut, a test field to try the speed, and what each badge means. Change the shortcut at `chrome://extensions/shortcuts`.
+
+It works only inside browser tabs. For native apps, VMs and remote desktop clients, use the Python script.
+
+To test the typing logic:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
+  --virtual-time-budget=10000 --dump-dom "file://$PWD/extension/test/typer-test.html" \
+  | grep -E '^(PASS|FAIL|ALL)'
+```
+
 ## Testing
 
 Run the unit tests with:

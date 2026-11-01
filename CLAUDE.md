@@ -21,6 +21,36 @@ uv run clipboard2keystroke.py
 
 Platform-specific wrappers: `run.bat` (Windows), `run.sh` (Unix).
 
+## Browser extension
+
+`extension/` is a Manifest V3 Chrome/Edge extension for web pages. It exists
+because macOS Secure Input (turned on by focused password fields, and sometimes
+left on by Chromium browsers) hides keyDown events from the Python script's
+event tap; only modifier events get through. Browser-handled `chrome.commands`
+shortcuts are unaffected.
+
+- `background.js`: on the `type-clipboard` command (`Alt+Shift+K`, kept
+  different from the script's hotkey so both can run), reads the clipboard via
+  an offscreen document (`offscreen.js`, `execCommand('paste')`, because
+  service workers have no DOM and offscreen docs never have focus), injects
+  `typer.js` into all frames, calls `c2kProbe` in each, and runs
+  `c2kTypeText` in exactly one frame (`pickFrame`). Clicking the toolbar icon
+  also types. That click can take focus away from the page, so when no frame
+  has focus it uses the frame whose remembered `activeElement` is a field.
+  Don't make typing require `document.hasFocus()`. If an all-frames inject
+  fails, it retries the top frame alone.
+- `typer.js`: no extension APIs, so `test/typer-test.html` can test it in plain
+  headless Chrome. Types each code point with keydown/keypress/keyup plus
+  `execCommand('insertText')` (trusted input events), falling back to the native
+  value setter. Skips newlines in single-line inputs, respects a cancelled
+  keydown, and stops if focus leaves the field.
+- `options.html` / `options.css` / `options.js`: the settings page. It loads
+  `typer.js` too, so its "Try it" field shows the real typing. It uses system
+  fonts only, so the page makes no network requests. Badge colours in
+  `background.js` match its legend.
+- `icons/`: `icon.svg` (48/128 px), `icon-32.svg` and `icon-16.svg`
+  (simplified for small sizes) are the sources for the PNGs.
+
 ## Installers
 
 `install.sh` (POSIX sh, macOS/Linux) and `install.ps1` (Windows) are meant to be

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+  Tests for typer.js. Run headless (prints PASS/FAIL lines in the dumped DOM):
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
+      --virtual-time-budget=10000 --dump-dom extension/test/typer-test.html \
+      | grep -E '^(PASS|FAIL|ALL)'
+  Or open the file in a browser and read the results on the page.
+-->
+<meta charset="utf-8">
+<input id="password" type="password">
+<textarea id="area"></textarea>
+<div id="rich" contenteditable="true"></div>
+<input id="masked" type="text">
+<input id="slow" type="text">
+<input id="other" type="text">
+<input id="checkbox" type="checkbox">
+<div id="host"></div>
+<pre id="results"></pre>
+<script src="../typer.js"></script>
+<script>
+const results = document.getElementById('results');
+results.textContent = '\n';  // so every result line starts a line
+let failed = 0;
+function check(name, actual, expected) {
+  const ok = JSON.stringify(actual) === JSON.stringify(expected);
+  if (!ok) failed++;
+  results.textContent += `${ok ? 'PASS' : 'FAIL'} ${name}` +
+    (ok ? '' : `: got ${JSON.stringify(actual)}, want ${JSON.stringify(expected)}`) + '\n';
+}
+const $ = (id) => document.getElementById(id);
+const type = (text, delay = 0) => globalThis.c2kTypeText(text, delay);
+
+(async () => {
+  // Password field: shifted symbols, spaces and a trailing newline (dropped).
+  const pw = $('password');
+  let inputs = 0;
+  pw.addEventListener('input', () => inputs++);
+  pw.focus();
+  check('password status', await type('Ab!@ 9"\n'), { status: 'typed', typed: 8 });
+  check('password value', pw.value, 'Ab!@ 9"');
+  check('password input events', inputs, 7);
+
+  // Textarea keeps newlines; \r is dropped.
+  $('area').focus();
+  await type('a\r\nb');
+  check('textarea value', $('area').value, 'a\nb');
+
+  // Non-BMP characters are typed whole.
+  $('other').focus();
+  await type('x😀y');
+  check('emoji', $('other').value, 'x😀y');
+
+  $('rich').focus();
+  await type('hi there');
+  check('contenteditable', $('rich').textContent, 'hi there');
+
+  // A cancelled keydown means the page handled the key itself.
+  $('masked').addEventListener('keydown', (e) => {
+    if (e.key === 'x') e.preventDefault();
+  });
+  $('masked').focus();
+  await type('axb');
+  check('keydown preventDefault respected', $('masked').value, 'ab');
+
+  // Field inside an open shadow root.
+  const shadowInput = document.createElement('input');
+  $('host').attachShadow({ mode: 'open' }).appendChild(shadowInput);
+  shadowInput.focus();
+  await type('shadow');
+  check('shadow DOM', shadowInput.value, 'shadow');
+
+  check('probe on a field', globalThis.c2kProbe().editable, true);
+
+  $('checkbox').focus();
+  check('probe on a non-field', globalThis.c2kProbe().editable, false);
+  check('non-text field', await type('abc'), { status: 'no-field', typed: 0 });
+
+  // Focus moving away stops typing; nothing lands in the new field.
+  $('slow').focus();
+  const pending = type('abcdefgh', 20);
+  check('second call while typing', await type('zzz'), { status: 'busy', typed: 0 });
+  await new Promise((r) => setTimeout(r, 50));
+  $('other').value = '';
+  $('other').focus();
+  const stopped = await pending;
+  check('stopped status', stopped.status, 'stopped');
+  check('stopped partial', $('slow').value, 'abcdefgh'.slice(0, stopped.typed));
+  check('nothing typed into new focus', $('other').value, '');
+
+  results.textContent += failed ? `${failed} FAILED\n` : 'ALL PASSED\n';
+})().catch((e) => { results.textContent += `FAIL exception ${e}\n`; });
+</script>

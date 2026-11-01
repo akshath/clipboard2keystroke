@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clipboard2Keystroke settings</title>
+  <link rel="icon" href="icons/icon32.png">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+<main class="page">
+
+  <header class="header">
+    <img src="icons/icon128.png" width="56" height="56" alt="">
+    <div class="header-text">
+      <h1>Clipboard<span class="accent">2</span>Keystroke</h1>
+      <p class="muted">Types your clipboard into web pages that block paste.</p>
+    </div>
+    <span class="pill" id="version">v1.0.0</span>
+  </header>
+
+  <section class="card">
+    <h2>How to use it</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-title">Copy the text</div>
+        <div class="muted">A password, a code, anything on your clipboard.</div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-title">Click into the field</div>
+        <div class="muted">On the page where paste doesn’t work.</div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-title">Click the icon</div>
+        <div class="muted">Or press the shortcut. It types for you.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card card-row">
+    <div class="grow">
+      <h2>Keyboard shortcut</h2>
+      <p class="muted">Works even when a password field has focus.</p>
+    </div>
+    <div class="keys" id="shortcut" aria-label="Current shortcut"></div>
+    <button type="button" class="btn" id="change-shortcut">Change shortcut</button>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Typing speed</h2>
+      <div class="saved" id="saved" aria-live="polite" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        Saved
+      </div>
+    </div>
+    <div class="presets" role="group" aria-label="Speed presets">
+      <button type="button" class="preset" data-ms="0">Instant<span>no delay</span></button>
+      <button type="button" class="preset" data-ms="30">Fast<span>30 ms</span></button>
+      <button type="button" class="preset" data-ms="100">Normal<span>100 ms</span></button>
+      <button type="button" class="preset" data-ms="250">Careful<span>250 ms</span></button>
+    </div>
+    <div class="slider">
+      <div class="slider-head">
+        <label for="delay">Delay between characters</label>
+        <output for="delay" id="delay-label"></output>
+      </div>
+      <input id="delay" type="range" min="0" max="500" step="10">
+      <p class="muted small">Slow it down if a site drops characters. Instant types everything at once.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Try it</h2>
+    <label for="test-field">Test field</label>
+    <div class="try">
+      <input id="test-field" type="text" placeholder="Sample text appears here" autocomplete="off">
+      <button type="button" class="btn btn-primary" id="type-sample">Type sample at this speed</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>What the icon badge means</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="badge badge-ok">OK</span>Typed into the field</div>
+      <div class="legend-item"><span class="badge badge-warn">?</span>No text field was selected</div>
+      <div class="legend-item"><span class="badge badge-warn">STOP</span>You moved focus, so it stopped</div>
+      <div class="legend-item"><span class="badge badge-err">ERR</span>This page can’t be typed into</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span>Your clipboard is read only when you click the icon or press the shortcut. It is never stored or sent anywhere.</span>
+  </footer>
+
+</main>
+<script src="typer.js"></script>
+<script src="options.js"></script>
+</body>
+</html>
