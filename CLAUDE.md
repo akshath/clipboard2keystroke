@@ -52,17 +52,19 @@ shortcuts are unaffected.
 - `icons/`: `icon.svg` (48/128 px), `icon-32.svg` and `icon-16.svg`
   (simplified for small sizes) are the sources for the PNGs.
 
-Firefox differences, all handled at runtime from the same files: the manifest
-lists both `background.service_worker` (Chrome 121+ uses it and ignores
-`scripts`) and `background.scripts` (Firefox). Firefox has no `chrome.offscreen`,
-so `readClipboard()` reads `navigator.clipboard` directly from the background
-page. Options use `options_ui` (not `options_page`), and "Change shortcut" calls
-`commands.openShortcutSettings()` where it exists. `browser_specific_settings.gecko`
-holds the add-on ID (don't change it once published) and
-`data_collection_permissions`.
+Firefox: `extension/manifest.json` is the Chrome/Edge manifest; keep it free
+of Firefox keys (Chrome lists `background.scripts` and
+`browser_specific_settings` as errors). `package.sh` builds the Firefox
+variant into `dist/firefox/`: `background.scripts` instead of the service
+worker, no `offscreen` permission or files, no `minimum_chrome_version`, and
+`browser_specific_settings` from `firefox/browser_specific_settings.json`
+(holds the add-on ID: never change it once published). The code handles both
+at runtime: `readClipboard()` reads `navigator.clipboard` directly when there
+is no `chrome.offscreen`, and "Change shortcut" calls
+`commands.openShortcutSettings()` where it exists.
 
-Publishing: `package.sh` zips `extension/` into `dist/` (skipping `test/` and
-the icon SVGs). `store/render.sh` renders the store images from
+Publishing: `package.sh` zips `extension/` into `dist/` for Chrome/Edge and
+Firefox (skipping `test/` and the icon SVGs). `store/render.sh` renders the store images from
 `store/src/*.html` and the real `options.html`, using a stand-in for the
 `chrome.*` APIs. `store/STORE_LISTING.md` and `PRIVACY.md` must stay accurate
 when permissions or data handling change.

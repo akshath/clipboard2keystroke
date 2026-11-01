@@ -130,7 +130,7 @@ On macOS, a focused password field (or a browser that leaves it stuck on) turns 
 
 To update later, pull or download again, then click the reload icon on the extension's card.
 
-**Install in Firefox** (140 or later): open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick `extension/manifest.json`. Regular Firefox only keeps signed add-ons, so a temporary one is removed when Firefox restarts. For a permanent install, use the version from Firefox Add-ons once it's published.
+**Install in Firefox** (140 or later): run `./package.sh` to build the Firefox version into `dist/firefox/`, then open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick `dist/firefox/manifest.json`. Regular Firefox only keeps signed add-ons, so a temporary one is removed when Firefox restarts. For a permanent install, use the version from Firefox Add-ons once it's published.
 
 **Use:** click into a field, then either click the extension's toolbar icon or press **Alt+Shift+K** (on macOS **Option+Shift+K**). The extension types the clipboard into that field one character at a time. It uses a different shortcut from the Python script so that running both never types twice.
 
@@ -143,7 +143,7 @@ It works only inside browser tabs. For native apps, VMs and remote desktop clien
 
 ### Publishing
 
-`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store, Edge Add-ons and Firefox Add-ons (one zip works for all three). [`store/HOW_TO_PUBLISH.md`](store/HOW_TO_PUBLISH.md) walks through publishing and releasing updates; [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
+`./package.sh` builds `dist/clipboard2keystroke-chrome-<version>.zip` for the Chrome Web Store and Edge Add-ons, and `dist/clipboard2keystroke-firefox-<version>.zip` for Firefox Add-ons. [`store/HOW_TO_PUBLISH.md`](store/HOW_TO_PUBLISH.md) walks through publishing and releasing updates; [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
 
 ## Troubleshooting
 
