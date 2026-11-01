@@ -76,7 +76,7 @@ run.bat
 
 ### Hotkey
 
-Once running, press **Ctrl+Alt+K** (Windows/Linux) or **Ctrl+Option+K** (macOS) to type out whatever is currently on your clipboard.
+Once running, press **Ctrl+Shift+K** (on macOS too: Control, not Cmd) to type out whatever is currently on your clipboard.
 
 Press **Ctrl+C** in the terminal to stop the script.
 
