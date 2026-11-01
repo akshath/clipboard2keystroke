@@ -26,3 +26,6 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Extension store packages (built by package.sh)
+dist/

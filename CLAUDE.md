@@ -51,6 +51,12 @@ shortcuts are unaffected.
 - `icons/`: `icon.svg` (48/128 px), `icon-32.svg` and `icon-16.svg`
   (simplified for small sizes) are the sources for the PNGs.
 
+Publishing: `package.sh` zips `extension/` into `dist/` (skipping `test/` and
+the icon SVGs). `store/render.sh` renders the store images from
+`store/src/*.html` and the real `options.html`, using a stand-in for the
+`chrome.*` APIs. `store/STORE_LISTING.md` and `PRIVACY.md` must stay accurate
+when permissions or data handling change.
+
 ## Installers
 
 `install.sh` (POSIX sh, macOS/Linux) and `install.ps1` (Windows) are meant to be
