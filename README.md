@@ -141,7 +141,7 @@ It works only inside browser tabs. For native apps, VMs and remote desktop clien
 
 ### Publishing
 
-`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store and Edge Add-ons. [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
+`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store and Edge Add-ons. [`store/HOW_TO_PUBLISH.md`](store/HOW_TO_PUBLISH.md) walks through publishing and releasing updates; [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
 
 ## Troubleshooting
 
