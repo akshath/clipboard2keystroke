@@ -1,5 +1,6 @@
 #!/bin/sh
-# Build the Chrome Web Store / Edge Add-ons upload: dist/clipboard2keystroke-<version>.zip
+# Build the store upload: dist/clipboard2keystroke-<version>.zip. The same zip
+# works for the Chrome Web Store, Edge Add-ons and Firefox Add-ons (AMO).
 # Usage: ./package.sh
 set -eu
 

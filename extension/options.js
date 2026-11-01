@@ -42,13 +42,16 @@ for (const button of presets) {
 
 // --- Shortcut -------------------------------------------------------------
 
-// macOS reports shortcuts as symbols ("⌥⇧K"), other platforms as "Alt+Shift+K".
-const KEY_NAMES = { '⌥': '⌥ Option', '⇧': '⇧ Shift', '⌘': '⌘ Command', '⌃': '⌃ Control' };
+// Chrome on macOS reports shortcuts as symbols ("⌥⇧K"); other platforms and
+// Firefox use names joined by "+" ("Alt+Shift+K"). Show Mac key names on Macs.
+const IS_MAC = /Mac/.test(navigator.platform);
+const SYMBOL_NAMES = { '⌥': '⌥ Option', '⇧': '⇧ Shift', '⌘': '⌘ Command', '⌃': '⌃ Control' };
+const MAC_NAMES = { Alt: '⌥ Option', Shift: '⇧ Shift', Command: '⌘ Command', MacCtrl: '⌃ Control' };
 
 function shortcutKeys(shortcut) {
   if (!shortcut) return [];
-  if (shortcut.includes('+')) return shortcut.split('+');
-  return [...shortcut].map((ch) => KEY_NAMES[ch] || ch);
+  if (!shortcut.includes('+')) return [...shortcut].map((ch) => SYMBOL_NAMES[ch] || ch);
+  return shortcut.split('+').map((key) => (IS_MAC && MAC_NAMES[key]) || key);
 }
 
 chrome.commands.getAll().then((commands) => {
@@ -72,10 +75,15 @@ chrome.commands.getAll().then((commands) => {
   });
 });
 
-// Pages cannot link to chrome:// URLs; open it through the tabs API. Edge
-// redirects chrome://extensions to edge://extensions.
+// Firefox (137+) opens its shortcut editor through the API. Chrome has no
+// such call, and pages cannot link to chrome:// URLs, so open it as a tab;
+// Edge redirects chrome://extensions to edge://extensions.
 document.getElementById('change-shortcut').addEventListener('click', () => {
-  chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+  if (chrome.commands.openShortcutSettings) {
+    chrome.commands.openShortcutSettings();
+  } else {
+    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+  }
 });
 
 // --- Try it ---------------------------------------------------------------

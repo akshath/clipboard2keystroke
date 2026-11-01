@@ -12,8 +12,8 @@ It comes in two forms:
 |---|---|---|
 | **Use it for** | Native apps, VMs, remote desktop clients | Web pages, especially login forms |
 | **Trigger** | **Ctrl+Shift+K** (on macOS too: Control, not Cmd) | Click the toolbar icon, or **Alt+Shift+K** (macOS: **Option+Shift+K**) |
-| **Runs on** | Windows, macOS, Linux (Python via `uv`) | Chrome, Edge |
-| **Set up** | [Desktop script](#desktop-script) | [Browser extension](#browser-extension-chrome--edge) |
+| **Runs on** | Windows, macOS, Linux (Python via `uv`) | Chrome, Edge, Firefox |
+| **Set up** | [Desktop script](#desktop-script) | [Browser extension](#browser-extension-chrome-edge-firefox) |
 
 On macOS, use the extension for password fields. A focused password field turns on Secure Input, which hides your keystrokes from the desktop script (see [Troubleshooting](#troubleshooting)).
 
@@ -115,7 +115,7 @@ C2K_DELAY_MS=250 clipboard2keystroke
 
 > **Heads up:** the text goes to whichever window has focus at the moment you press the hotkey, not to the window you copied from. If your clipboard holds a password or other secret, a mistimed hotkey will type it into the wrong place — check what is focused first.
 
-## Browser extension (Chrome / Edge)
+## Browser extension (Chrome, Edge, Firefox)
 
 For web pages, especially login forms, use the browser extension in [`extension/`](extension/).
 
@@ -130,18 +130,20 @@ On macOS, a focused password field (or a browser that leaves it stuck on) turns 
 
 To update later, pull or download again, then click the reload icon on the extension's card.
 
+**Install in Firefox** (140 or later): open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick `extension/manifest.json`. Regular Firefox only keeps signed add-ons, so a temporary one is removed when Firefox restarts. For a permanent install, use the version from Firefox Add-ons once it's published.
+
 **Use:** click into a field, then either click the extension's toolbar icon or press **Alt+Shift+K** (on macOS **Option+Shift+K**). The extension types the clipboard into that field one character at a time. It uses a different shortcut from the Python script so that running both never types twice.
 
 - Newlines are skipped in single-line fields, so a password copied with a trailing newline never submits the form.
 - Typing stops if focus leaves the field.
 - The toolbar icon shows the result briefly: **OK**, **?** (no text field focused), **STOP** (focus moved), **ERR** (the page can't be scripted, such as `chrome://` pages or the web store). Hover the icon for details.
-- Right-click the toolbar icon and choose **Options** for the settings page: typing speed (default 100 ms per character), the current shortcut, a test field to try the speed, and what each badge means. Change the shortcut at `chrome://extensions/shortcuts`.
+- Right-click the toolbar icon and choose **Options** for the settings page: typing speed (default 100 ms per character), the current shortcut, a test field to try the speed, and what each badge means. The **Change shortcut** button opens the browser's shortcut settings (`chrome://extensions/shortcuts`, or in Firefox **about:addons** › gear menu › **Manage Extension Shortcuts**).
 
 It works only inside browser tabs. For native apps, VMs and remote desktop clients, use the Python script.
 
 ### Publishing
 
-`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store and Edge Add-ons. [`store/HOW_TO_PUBLISH.md`](store/HOW_TO_PUBLISH.md) walks through publishing and releasing updates; [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
+`./package.sh` builds `dist/clipboard2keystroke-<version>.zip` for the Chrome Web Store, Edge Add-ons and Firefox Add-ons (one zip works for all three). [`store/HOW_TO_PUBLISH.md`](store/HOW_TO_PUBLISH.md) walks through publishing and releasing updates; [`store/STORE_LISTING.md`](store/STORE_LISTING.md) has the listing text, permission justifications and images to upload. `store/render.sh` regenerates the images. The privacy policy is [`PRIVACY.md`](PRIVACY.md).
 
 ## Troubleshooting
 

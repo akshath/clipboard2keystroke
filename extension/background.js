@@ -1,5 +1,6 @@
-// Service worker: on the keyboard shortcut, read the clipboard and type it
-// into the focused field of the active tab.
+// Background script: on the keyboard shortcut or a toolbar click, read the
+// clipboard and type it into the focused field of the active tab. Chrome and
+// Edge run it as a service worker, Firefox as a background page.
 //
 // The shortcut is handled by the browser itself, so it keeps working while
 // macOS Secure Input is on (e.g. a password field has focus), which hides
@@ -31,7 +32,8 @@ async function typeClipboard(tab) {
     const result = await injectAndType(tab.id, text, delayMs);
     flash(tab.id, result.status);
   } catch (err) {
-    // chrome://, edge://, the web store and PDF viewer refuse scripts.
+    // Browser pages (chrome://, edge://, about:), the extension stores and
+    // PDF viewers refuse scripts.
     flash(tab.id, 'error', `Cannot type on this page: ${err.message}`);
   }
 }
@@ -76,9 +78,16 @@ function pickFrame(probes) {
   return (sub || editable[0] || {}).frameId;
 }
 
-// Service workers have no DOM, so the clipboard is read in an offscreen
-// document (see offscreen.js).
 async function readClipboard() {
+  // Firefox runs this file as a background page, which can read the
+  // clipboard itself (clipboardRead permission). It has no offscreen API.
+  if (!chrome.offscreen) return navigator.clipboard.readText();
+  return readClipboardOffscreen();
+}
+
+// Chrome runs this file as a service worker, which has no DOM, so the
+// clipboard is read in an offscreen document (see offscreen.js).
+async function readClipboardOffscreen() {
   const existing = await chrome.runtime.getContexts({
     contextTypes: ['OFFSCREEN_DOCUMENT'],
   });

@@ -1,8 +1,9 @@
-# Store listing: Chrome Web Store and Edge Add-ons
+# Store listing: Chrome Web Store, Edge Add-ons and Firefox Add-ons
 
 Text and files to paste into the Chrome Web Store Developer Dashboard
 (https://chrome.google.com/webstore/devconsole) and Microsoft Partner Center
-(https://partner.microsoft.com/dashboard/microsoftedge).
+(https://partner.microsoft.com/dashboard/microsoftedge), and Firefox
+Add-ons (https://addons.mozilla.org/developers/).
 
 ## Before each upload
 
@@ -109,3 +110,30 @@ https://github.com/akshath/clipboard2keystroke/blob/main/PRIVACY.md
 Partner Center takes the same zip, description, images and privacy policy
 URL. Edge doesn't ask for per-permission justifications in the same form; if
 it asks for notes for certification, paste the permission table above.
+
+## Firefox Add-ons (AMO)
+
+The same zip works. Fields on addons.mozilla.org:
+
+| Field | Value |
+|---|---|
+| Name | Clipboard2Keystroke (from the manifest) |
+| Add-on URL | `clipboard2keystroke` |
+| Summary (max 250 characters) | the manifest `description` above |
+| Description | the same description as Chrome. AMO accepts Markdown, so the bullets can stay. |
+| Categories | Other (AMO has no Productivity category) |
+| Support email or website | https://github.com/akshath/clipboard2keystroke/issues |
+| License | MIT License |
+| Privacy policy | paste the text of `PRIVACY.md` (AMO takes the text, not a link) |
+| Icon | `extension/icons/icon128.png` (taken from the package) |
+| Screenshots | `store/screenshot-1-login.png`, `store/screenshot-2-settings.png` |
+| Source code | Not needed: the code isn't minified, bundled or generated. |
+
+The data-collection answer comes from the manifest
+(`data_collection_permissions: none`), so AMO shows "no data collected".
+
+**Notes to reviewer:**
+
+```
+The extension reads the clipboard only when the user clicks the toolbar icon or presses Alt+Shift+K, then types it into the field the user selected on the current tab (activeTab + scripting). Nothing is stored except the typing-speed setting, and there are no network requests. The "offscreen" permission and offscreen.html/offscreen.js are used only by Chrome; Firefox reads the clipboard directly from the background page. To test: copy some text, click into any text field, then click the toolbar icon.
+```
