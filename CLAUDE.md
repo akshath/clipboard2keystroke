@@ -78,8 +78,8 @@ not work reliably on macOS:
   (`wait_for_modifier_release()`, macOS only, 2 s timeout), reads the clipboard
   and calls `type_text()`. It catches all exceptions on purpose.
 - `wait_for_hotkey()` registers the hotkey and blocks. Hotkeys are spelled
-  differently per backend: `MACOS_HOTKEY` (`<ctrl>+<alt>+k`) for pynput,
-  `DEFAULT_HOTKEY` (`ctrl+alt+k`) for keyboard.
+  differently per backend: `MACOS_HOTKEY` (`<ctrl>+<shift>+k`) for pynput,
+  `DEFAULT_HOTKEY` (`ctrl+shift+k`) for keyboard.
 - `macos_hotkey_listener()` builds the pynput listener by hand instead of using
   `pynput.keyboard.GlobalHotKeys`. GlobalHotKeys' callbacks require an
   `injected` argument, but pynput's macOS backend omits it when a media key

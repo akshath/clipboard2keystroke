@@ -9,7 +9,7 @@
 
 # -------------------------------
 # send clipboard to keystroke
-# shortcut ctrl+alt+k (Windows/Linux) / ctrl+option+k (macOS)
+# shortcut ctrl+shift+k
 # -------------------------------
 
 import argparse
@@ -23,8 +23,8 @@ from datetime import datetime
 IS_MACOS = platform.system() == 'Darwin'
 
 # macOS uses pynput, which spells hotkeys differently than the keyboard library.
-MACOS_HOTKEY = '<ctrl>+<alt>+k'
-DEFAULT_HOTKEY = 'ctrl+alt+k'
+MACOS_HOTKEY = '<ctrl>+<shift>+k'
+DEFAULT_HOTKEY = 'ctrl+shift+k'
 
 # Default per-character delay in milliseconds (0 disables the delay).
 DELAY_MS = 100.0
@@ -220,7 +220,7 @@ def wait_for_hotkey():
         if IS_MACOS:
             from pynput import keyboard as pynput_keyboard
 
-            print('Waiting for hotkey ctrl+option+k')
+            print('Waiting for hotkey ctrl+shift+k')
             with macos_hotkey_listener(pynput_keyboard, MACOS_HOTKEY,
                                        on_hotkey) as listener:
                 listener.join()
