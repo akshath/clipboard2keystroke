@@ -1,5 +1,5 @@
-// Injected into every frame of the active tab. Defines c2kTypeText(text,
-// delayMs), which types `text` into the focused field of this frame one
+// Injected into every frame of the active tab. Defines c2kProbe() and
+// c2kTypeText(text, delayMs), which types `text` into the focused field of this frame one
 // character at a time. Kept free of extension APIs so it can be tested in a
 // plain page (see test/typer-test.html).
 (() => {
@@ -81,11 +81,18 @@
 
   let busy = false;
 
+  // Reports whether this frame has a field to type into, so the service
+  // worker can pick one frame. Clicking the toolbar icon can take focus away
+  // from the page, but document.activeElement still remembers the field.
+  globalThis.c2kProbe = () => ({
+    focused: document.hasFocus(),
+    editable: fieldKind(deepActiveElement(document)) !== null,
+  });
+
   // Resolves to {status, typed}. status is 'typed', 'stopped' (focus moved
-  // away mid-way), 'busy', 'no-focus' (this frame is not focused) or
-  // 'no-field' (the focused element does not take text).
+  // away mid-way), 'busy' or 'no-field' (the focused element does not take
+  // text). Works whether or not the window has focus.
   globalThis.c2kTypeText = async (text, delayMs) => {
-    if (!document.hasFocus()) return { status: 'no-focus', typed: 0 };
     if (busy) return { status: 'busy', typed: 0 };
     const el = deepActiveElement(document);
     const kind = fieldKind(el);

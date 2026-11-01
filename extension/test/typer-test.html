@@ -69,7 +69,10 @@ const type = (text, delay = 0) => globalThis.c2kTypeText(text, delay);
   await type('shadow');
   check('shadow DOM', shadowInput.value, 'shadow');
 
+  check('probe on a field', globalThis.c2kProbe().editable, true);
+
   $('checkbox').focus();
+  check('probe on a non-field', globalThis.c2kProbe().editable, false);
   check('non-text field', await type('abc'), { status: 'no-field', typed: 0 });
 
   // Focus moving away stops typing; nothing lands in the new field.

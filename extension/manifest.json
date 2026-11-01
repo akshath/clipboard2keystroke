@@ -9,7 +9,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Clipboard2Keystroke: press Alt+Shift+K in a field to type the clipboard"
+    "default_title": "Type the clipboard into the focused field (or press Alt+Shift+K)"
   },
   "options_page": "options.html",
   "commands": {

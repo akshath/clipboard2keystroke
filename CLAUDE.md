@@ -33,8 +33,12 @@ shortcuts are unaffected.
   different from the script's hotkey so both can run), reads the clipboard via
   an offscreen document (`offscreen.js`, `execCommand('paste')`, because
   service workers have no DOM and offscreen docs never have focus), injects
-  `typer.js` into all frames, then calls `c2kTypeText`. Only the focused frame
-  types. If an all-frames inject fails, it retries the top frame alone.
+  `typer.js` into all frames, calls `c2kProbe` in each, and runs
+  `c2kTypeText` in exactly one frame (`pickFrame`). Clicking the toolbar icon
+  also types. That click can take focus away from the page, so when no frame
+  has focus it uses the frame whose remembered `activeElement` is a field.
+  Don't make typing require `document.hasFocus()`. If an all-frames inject
+  fails, it retries the top frame alone.
 - `typer.js`: no extension APIs, so `test/typer-test.html` can test it in plain
   headless Chrome. Types each code point with keydown/keypress/keyup plus
   `execCommand('insertText')` (trusted input events), falling back to the native

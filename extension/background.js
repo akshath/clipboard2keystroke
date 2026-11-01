@@ -17,7 +17,9 @@ chrome.commands.onCommand.addListener((command, tab) => {
   if (command === 'type-clipboard') typeClipboard(tab);
 });
 
-chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
+// Clicking the toolbar icon types too. Options are on the icon's right-click
+// menu (Chrome adds it for options_page).
+chrome.action.onClicked.addListener((tab) => typeClipboard(tab));
 
 async function typeClipboard(tab) {
   if (!tab || tab.id === undefined) return;
@@ -26,13 +28,8 @@ async function typeClipboard(tab) {
     const text = await readClipboard();
     if (!text) return flash(tab.id, 'empty');
 
-    const results = await injectAndType(tab.id, text, delayMs);
-    const statuses = results.map((r) => r && r.result && r.result.status);
-    // Only the focused frame types; every other frame reports 'no-focus'.
-    for (const status of ['typed', 'stopped', 'busy', 'no-field']) {
-      if (statuses.includes(status)) return flash(tab.id, status);
-    }
-    flash(tab.id, 'no-field');
+    const result = await injectAndType(tab.id, text, delayMs);
+    flash(tab.id, result.status);
   } catch (err) {
     // chrome://, edge://, the web store and PDF viewer refuse scripts.
     flash(tab.id, 'error', `Cannot type on this page: ${err.message}`);
@@ -40,20 +37,43 @@ async function typeClipboard(tab) {
 }
 
 async function injectAndType(tabId, text, delayMs) {
-  // Login forms often live in iframes, so try every frame. Frames we may not
-  // script make the whole call fail; fall back to the top frame alone.
-  for (const target of [{ tabId, allFrames: true }, { tabId }]) {
+  // Login forms often live in iframes, so look at every frame. Frames we may
+  // not script make the whole call fail; fall back to the top frame alone.
+  let probes;
+  let target;
+  for (target of [{ tabId, allFrames: true }, { tabId }]) {
     try {
       await chrome.scripting.executeScript({ target, files: ['typer.js'] });
-      return await chrome.scripting.executeScript({
-        target,
-        func: (t, d) => globalThis.c2kTypeText(t, d),
-        args: [text, delayMs],
+      probes = await chrome.scripting.executeScript({
+        target, func: () => globalThis.c2kProbe(),
       });
+      break;
     } catch (err) {
       if (target.allFrames === undefined) throw err;
     }
   }
+
+  const frameId = pickFrame(probes);
+  if (frameId === undefined) return { status: 'no-field' };
+  const [{ result }] = await chrome.scripting.executeScript({
+    target: { tabId, frameIds: [frameId] },
+    func: (t, d) => globalThis.c2kTypeText(t, d),
+    args: [text, delayMs],
+  });
+  return result;
+}
+
+// Type into exactly one frame. Prefer the frame that has focus (the keyboard
+// shortcut). After a toolbar click no frame may have focus, so take the frame
+// whose last-focused element is a field; prefer an iframe, because the top
+// frame's remembered element is usually the <iframe> holding the form.
+function pickFrame(probes) {
+  const editable = probes.filter((p) => p.result && p.result.editable);
+  const focused = editable.find((p) => p.result.focused);
+  if (focused) return focused.frameId;
+  if (probes.some((p) => p.result && p.result.focused)) return undefined;
+  const sub = editable.find((p) => p.frameId !== 0);
+  return (sub || editable[0] || {}).frameId;
 }
 
 // Service workers have no DOM, so the clipboard is read in an offscreen
